@@ -1,0 +1,36 @@
+# https://openmw.readthedocs.io/en/openmw-0.49.0/reference/lua-scripting/openmw_core.html##(core).l10n
+# https://openmw.readthedocs.io/en/openmw-0.49.0/reference/modding/localisation.html
+
+---
+
+ModName: Tab To Close
+ModDescription: |-
+  Force close chosen UI with chosen Key.
+
+  - Originally made for the tab key, which can get stuck in the inventory search bar, disallowing you to use it to close the inventory UI.
+
+SectionName_CloseKey: Close Key
+SectionDescription_CloseKey: |-
+  Which key to use to close selected UI
+
+SettingsName_KeyChoice: Key Choice
+
+KeyChoices_InventoryKey: InventoryKey
+KeyChoices_TabKey: TabKey
+KeyChoices_CustomKey: CustomKey
+
+SettingsDescription_KeyChoice: |-
+  - {KeyChoices_InventoryKey}: Use the key you use to open the inventory.
+  - {KeyChoices_TabKey}: Use the tab key.
+  - {KeyChoices_CustomKey}: Use the custom key. Must set {SettingsName_CustomKey} or this will do nothing.
+
+SettingsName_CustomKey: Custom Key
+SettingsDescription_CustomKey: Must set {SettingsName_KeyChoice} to {KeyChoices_CustomKey} for this key to be used.
+
+SectionName_UI: UI
+SectionDescription_UI: |-
+  - Select UI to closen when you press the chosen key in the {SectionName_CloseKey} section.
+
+# You can overwrite the name of any UI setting by placing it here: Just prefix it with "SettingsUI_"
+# Example: 
+# SettingsUI_Interface: Interface

@@ -1,0 +1,5 @@
+# Script Types: https://openmw.readthedocs.io/en/openmw-0.49.0/reference/lua-scripting/overview.html#format-of-omwscripts
+# Certain APIs can only be used in certain scripts: https://openmw.readthedocs.io/en/openmw-0.49.0/reference/lua-scripting/api.html
+# These scripts run as seperate Lua instances and only events can communicate between them. Global Lua variables are not shared amongst them.
+
+PLAYER: scripts/ArshvirGoraya/tabToClose/Player/playerEntry.lua
