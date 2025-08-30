@@ -42,7 +42,19 @@ local RendererEnum = {
 local setting_closeKey : settings.SettingOptions = {}
 setting_closeKey.renderer = RendererEnum.select
 setting_closeKey.name = localize("SettingsName_KeyChoice")
-local setting_closeKeyList : table = {
+
+local record CloseKeyTable 
+  inventoryKey: string
+  tabKey: string
+  customKey: string
+end
+local setting_closeKeyTable : CloseKeyTable = {
+  inventoryKey = localize("KeyChoices_InventoryKey"),
+  tabKey = localize("KeyChoices_TabKey"),
+  customKey = localize("KeyChoices_CustomKey"),
+}
+
+local setting_closeKeyList : {string} = {
   localize("KeyChoices_InventoryKey"),
   localize("KeyChoices_TabKey"),
   localize("KeyChoices_CustomKey"),
@@ -146,9 +158,12 @@ for _, v in ipairs(setting_closeKeyList)do
 end
 if not selectedFoundInList then
   closeKey.set(closeKey, setting_closeKey.key, setting_closeKey.default)
+  closeKeySelect = setting_closeKey.default
 end
 
 -- Detector
+local tabPressedPreviousFrame : boolean = false
+local tabPressedThisFrame : boolean = false
 local tabReleasedThisFrame : boolean = false
 local customKeyPressedPreviousFrame : boolean = false
 local customKeyReleasedThisFrame : boolean = false
@@ -157,32 +172,71 @@ local inventoryPressedPreviousFrame : boolean = false
 local inventoryReleasedThisFrame : boolean = false
 local inventoryPressedThisFrame : boolean = false
 
+local tabJustPressed : boolean = false
+local inventoryJustPressed : boolean = false
+local customKeyJustPressed : boolean = false
+
+local function closeUITrigger()
+  DB.log("close UI")
+end
+
 return {
   -- https://openmw.readthedocs.io/en/openmw-0.49.0/reference/lua-scripting/overview.html#script-structure
   engineHandlers = {
     -- https://openmw.readthedocs.io/en/openmw-0.49.0/reference/lua-scripting/engine_handlers.html#engine-handlers-reference
+    onKeyPress = function (key : input.KeyboardEvent)
+      tabPressedThisFrame = key.code == input.KEY.Tab
+    end,
     onKeyRelease = function (key : input.KeyboardEvent)
       tabReleasedThisFrame = key.code == input.KEY.Tab
     end,
     onFrame = function()
-      inventoryPressedThisFrame = input.isActionPressed(input.ACTION.Inventory)
-      inventoryReleasedThisFrame = not inventoryPressedThisFrame and inventoryPressedPreviousFrame
-      inventoryPressedPreviousFrame = inventoryPressedThisFrame
-      --
-      customKeyPressedThisFrame = input.getBooleanActionValue(customKey.key)
-      customKeyReleasedThisFrame = not customKeyPressedThisFrame and customKeyPressedPreviousFrame
-      customKeyPressedPreviousFrame = customKeyPressedThisFrame
-      --
-      if inventoryReleasedThisFrame then
-        print("inventory released this frame")
+      closeKeySelect = closeKey.get(closeKey, setting_closeKey.key)
+      local onRelease = closeKey.get(closeKey, setting_onRelease.key)
+      if closeKeySelect == setting_closeKeyTable.inventoryKey then
+        inventoryPressedThisFrame = input.isActionPressed(input.ACTION.Inventory)
+        if not onRelease then
+          inventoryJustPressed = inventoryPressedThisFrame and not inventoryPressedPreviousFrame
+          if inventoryJustPressed then
+            closeUITrigger()
+          end
+        else
+          inventoryReleasedThisFrame = not inventoryPressedThisFrame and inventoryPressedPreviousFrame
+          if inventoryReleasedThisFrame then
+            closeUITrigger()
+          end
+        end
+        inventoryPressedPreviousFrame = inventoryPressedThisFrame
+      ---
+      elseif closeKeySelect == setting_closeKeyTable.tabKey then
+        if not onRelease then
+          tabJustPressed = tabPressedThisFrame and not tabPressedPreviousFrame
+          if tabJustPressed then
+            closeUITrigger()
+          end
+        else
+          if tabReleasedThisFrame then
+            closeUITrigger()
+          end
+        end
+        tabPressedPreviousFrame = tabPressedThisFrame
+        tabPressedThisFrame = false
+        tabReleasedThisFrame = false
+      elseif closeKeySelect == setting_closeKeyTable.customKey then
+        customKeyPressedThisFrame = input.getBooleanActionValue(customKey.key)
+        if not onRelease then
+          customKeyJustPressed = customKeyPressedThisFrame and not customKeyPressedPreviousFrame
+          if customKeyJustPressed then 
+            closeUITrigger()
+          end
+        else
+          customKeyReleasedThisFrame = not customKeyPressedThisFrame and customKeyPressedPreviousFrame
+          if customKeyReleasedThisFrame then
+            closeUITrigger()
+          end
+        end
+        customKeyPressedPreviousFrame = customKeyPressedThisFrame
       end
-      if customKeyReleasedThisFrame then
-        print("custom key released this frame")
-      end
-      if tabReleasedThisFrame then
-        print("tab released this frame")
-      end
-      tabReleasedThisFrame = false
     end,
   },
   -- eventHandlers = {

@@ -42,6 +42,18 @@ local RendererEnum = {
 local setting_closeKey = {}
 setting_closeKey.renderer = RendererEnum.select
 setting_closeKey.name = localize("SettingsName_KeyChoice")
+
+
+
+
+
+
+local setting_closeKeyTable = {
+   inventoryKey = localize("KeyChoices_InventoryKey"),
+   tabKey = localize("KeyChoices_TabKey"),
+   customKey = localize("KeyChoices_CustomKey"),
+}
+
 local setting_closeKeyList = {
    localize("KeyChoices_InventoryKey"),
    localize("KeyChoices_TabKey"),
@@ -146,9 +158,12 @@ for _, v in ipairs(setting_closeKeyList) do
 end
 if not selectedFoundInList then
    closeKey.set(closeKey, setting_closeKey.key, setting_closeKey.default)
+   closeKeySelect = setting_closeKey.default
 end
 
 
+local tabPressedPreviousFrame = false
+local tabPressedThisFrame = false
 local tabReleasedThisFrame = false
 local customKeyPressedPreviousFrame = false
 local customKeyReleasedThisFrame = false
@@ -157,32 +172,71 @@ local inventoryPressedPreviousFrame = false
 local inventoryReleasedThisFrame = false
 local inventoryPressedThisFrame = false
 
+local tabJustPressed = false
+local inventoryJustPressed = false
+local customKeyJustPressed = false
+
+local function closeUITrigger()
+   DB.log("close UI")
+end
+
 return {
 
    engineHandlers = {
 
+      onKeyPress = function(key)
+         tabPressedThisFrame = key.code == input.KEY.Tab
+      end,
       onKeyRelease = function(key)
          tabReleasedThisFrame = key.code == input.KEY.Tab
       end,
       onFrame = function()
-         inventoryPressedThisFrame = input.isActionPressed(input.ACTION.Inventory)
-         inventoryReleasedThisFrame = not inventoryPressedThisFrame and inventoryPressedPreviousFrame
-         inventoryPressedPreviousFrame = inventoryPressedThisFrame
+         closeKeySelect = closeKey.get(closeKey, setting_closeKey.key)
+         local onRelease = closeKey.get(closeKey, setting_onRelease.key)
+         if closeKeySelect == setting_closeKeyTable.inventoryKey then
+            inventoryPressedThisFrame = input.isActionPressed(input.ACTION.Inventory)
+            if not onRelease then
+               inventoryJustPressed = inventoryPressedThisFrame and not inventoryPressedPreviousFrame
+               if inventoryJustPressed then
+                  closeUITrigger()
+               end
+            else
+               inventoryReleasedThisFrame = not inventoryPressedThisFrame and inventoryPressedPreviousFrame
+               if inventoryReleasedThisFrame then
+                  closeUITrigger()
+               end
+            end
+            inventoryPressedPreviousFrame = inventoryPressedThisFrame
 
-         customKeyPressedThisFrame = input.getBooleanActionValue(customKey.key)
-         customKeyReleasedThisFrame = not customKeyPressedThisFrame and customKeyPressedPreviousFrame
-         customKeyPressedPreviousFrame = customKeyPressedThisFrame
-
-         if inventoryReleasedThisFrame then
-            print("inventory released this frame")
+         elseif closeKeySelect == setting_closeKeyTable.tabKey then
+            if not onRelease then
+               tabJustPressed = tabPressedThisFrame and not tabPressedPreviousFrame
+               if tabJustPressed then
+                  closeUITrigger()
+               end
+            else
+               if tabReleasedThisFrame then
+                  closeUITrigger()
+               end
+            end
+            tabPressedPreviousFrame = tabPressedThisFrame
+            tabPressedThisFrame = false
+            tabReleasedThisFrame = false
+         elseif closeKeySelect == setting_closeKeyTable.customKey then
+            customKeyPressedThisFrame = input.getBooleanActionValue(customKey.key)
+            if not onRelease then
+               customKeyJustPressed = customKeyPressedThisFrame and not customKeyPressedPreviousFrame
+               if customKeyJustPressed then
+                  closeUITrigger()
+               end
+            else
+               customKeyReleasedThisFrame = not customKeyPressedThisFrame and customKeyPressedPreviousFrame
+               if customKeyReleasedThisFrame then
+                  closeUITrigger()
+               end
+            end
+            customKeyPressedPreviousFrame = customKeyPressedThisFrame
          end
-         if customKeyReleasedThisFrame then
-            print("custom key released this frame")
-         end
-         if tabReleasedThisFrame then
-            print("tab released this frame")
-         end
-         tabReleasedThisFrame = false
       end,
    },
 
