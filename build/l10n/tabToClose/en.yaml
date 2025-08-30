@@ -15,9 +15,9 @@ SectionDescription_CloseKey: |-
 
 SettingsName_KeyChoice: Key Choice
 
-KeyChoices_InventoryKey: InventoryKey
-KeyChoices_TabKey: TabKey
-KeyChoices_CustomKey: CustomKey
+KeyChoices_InventoryKey: Inventory Key
+KeyChoices_TabKey: Tab Key
+KeyChoices_CustomKey: Custom Key
 
 SettingsDescription_KeyChoice: |-
   - {KeyChoices_InventoryKey}: Use the key you use to open the inventory.
@@ -26,6 +26,10 @@ SettingsDescription_KeyChoice: |-
 
 SettingsName_CustomKey: Custom Key
 SettingsDescription_CustomKey: Must set {SettingsName_KeyChoice} to {KeyChoices_CustomKey} for this key to be used.
+KeyDesciption_CustomKey: Force closes select UI
+
+SettingsName_OnRelease: On Release
+SettingsDescription_OnRelease: If true, will trigger UI close on key release instead of on press.
 
 SectionName_UI: UI
 SectionDescription_UI: |-

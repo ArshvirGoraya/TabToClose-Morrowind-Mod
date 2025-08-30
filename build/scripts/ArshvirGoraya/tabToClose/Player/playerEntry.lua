@@ -47,7 +47,10 @@ local setting_closeKeyList = {
    localize("KeyChoices_TabKey"),
    localize("KeyChoices_CustomKey"),
 }
-setting_closeKey.argument = setting_closeKeyList
+setting_closeKey.argument = {
+   l10n = l10n,
+   items = setting_closeKeyList,
+}
 setting_closeKey.default = localize("KeyChoices_InventoryKey")
 setting_closeKey.description = localize("SettingsDescription_KeyChoice", {
    KeyChoices_InventoryKey = localize("KeyChoices_InventoryKey"),
@@ -57,6 +60,17 @@ setting_closeKey.description = localize("SettingsDescription_KeyChoice", {
 })
 setting_closeKey.key = "tabToCloseSetting_CloseKey"
 
+
+
+local customKey = {}
+customKey.defaultValue = false
+customKey.description = localize("KeyDesciption_CustomKey")
+customKey.name = localize("SettingsName_CustomKey")
+customKey.key = "TabToClose_CustomKey"
+customKey.l10n = l10n
+customKey.type = input.ACTION_TYPE.Boolean
+input.registerAction(customKey)
+
 local setting_customKey = {}
 setting_customKey.renderer = RendererEnum.inputBinding
 setting_customKey.name = localize("SettingsName_CustomKey")
@@ -65,14 +79,28 @@ setting_customKey.description = localize("SettingsDescription_CustomKey", {
    KeyChoices_CustomKey = localize("KeyChoices_CustomKey"),
 })
 setting_customKey.key = "tabToCloseSetting_CustomKey"
+setting_customKey.default = "tab"
+setting_customKey.argument = {
+   key = customKey.key,
+   type = "action",
+}
+
+
+local setting_onRelease = {}
+setting_onRelease.name = localize("SettingsName_OnRelease")
+setting_onRelease.description = localize("SettingsDescription_OnRelease")
+setting_onRelease.renderer = RendererEnum.checkbox
+setting_onRelease.default = false
+setting_onRelease.key = "tablToCloseSetting_OnRelease"
+
 
 
 settingsSection_CloseKey.settings = {
    setting_closeKey,
    setting_customKey,
+   setting_onRelease,
 }
 settings.registerGroup(settingsSection_CloseKey)
-
 
 
 local settingsSection_UI = {}
@@ -120,15 +148,41 @@ if not selectedFoundInList then
    closeKey.set(closeKey, setting_closeKey.key, setting_closeKey.default)
 end
 
+
+local tabReleasedThisFrame = false
+local customKeyPressedPreviousFrame = false
+local customKeyReleasedThisFrame = false
+local customKeyPressedThisFrame = input.getBooleanActionValue(customKey.key)
+local inventoryPressedPreviousFrame = false
+local inventoryReleasedThisFrame = false
+local inventoryPressedThisFrame = false
+
 return {
 
    engineHandlers = {
 
       onKeyRelease = function(key)
+         tabReleasedThisFrame = key.code == input.KEY.Tab
+      end,
+      onFrame = function()
+         inventoryPressedThisFrame = input.isActionPressed(input.ACTION.Inventory)
+         inventoryReleasedThisFrame = not inventoryPressedThisFrame and inventoryPressedPreviousFrame
+         inventoryPressedPreviousFrame = inventoryPressedThisFrame
 
+         customKeyPressedThisFrame = input.getBooleanActionValue(customKey.key)
+         customKeyReleasedThisFrame = not customKeyPressedThisFrame and customKeyPressedPreviousFrame
+         customKeyPressedPreviousFrame = customKeyPressedThisFrame
 
-
-
+         if inventoryReleasedThisFrame then
+            print("inventory released this frame")
+         end
+         if customKeyReleasedThisFrame then
+            print("custom key released this frame")
+         end
+         if tabReleasedThisFrame then
+            print("tab released this frame")
+         end
+         tabReleasedThisFrame = false
       end,
    },
 

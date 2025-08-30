@@ -47,7 +47,10 @@ local setting_closeKeyList : table = {
   localize("KeyChoices_TabKey"),
   localize("KeyChoices_CustomKey"),
 }
-setting_closeKey.argument = setting_closeKeyList
+setting_closeKey.argument = {
+  l10n = l10n,
+  items = setting_closeKeyList
+}
 setting_closeKey.default = localize("KeyChoices_InventoryKey")
 setting_closeKey.description = localize("SettingsDescription_KeyChoice", {
   KeyChoices_InventoryKey = localize("KeyChoices_InventoryKey"),
@@ -57,6 +60,17 @@ setting_closeKey.description = localize("SettingsDescription_KeyChoice", {
 })
 setting_closeKey.key = "tabToCloseSetting_CloseKey"
 -- Setting: CustomKey
+
+-- CustomKey Setting: Input
+local customKey : input.ActionInfo = {}
+customKey.defaultValue = false
+customKey.description = localize("KeyDesciption_CustomKey")
+customKey.name = localize("SettingsName_CustomKey")
+customKey.key = "TabToClose_CustomKey"
+customKey.l10n = l10n
+customKey.type = input.ACTION_TYPE.Boolean
+input.registerAction(customKey)
+
 local setting_customKey : settings.SettingOptions = {}
 setting_customKey.renderer = RendererEnum.inputBinding
 setting_customKey.name = localize("SettingsName_CustomKey")
@@ -65,14 +79,28 @@ setting_customKey.description = localize("SettingsDescription_CustomKey", {
   KeyChoices_CustomKey = localize("KeyChoices_CustomKey")
 })
 setting_customKey.key = "tabToCloseSetting_CustomKey"
--- setting_customKey.default = "" -- default should be whatever it is for opening inventory -> dont have that in input.Actions yet as of 0.49
+setting_customKey.default = "tab"
+setting_customKey.argument = {
+  key = customKey.key,
+  type = "action"
+}
+
+-- setting: OnRelease
+local setting_onRelease : settings.SettingOptions = {}
+setting_onRelease.name = localize("SettingsName_OnRelease")
+setting_onRelease.description= localize("SettingsDescription_OnRelease")
+setting_onRelease.renderer = RendererEnum.checkbox
+setting_onRelease.default = false
+setting_onRelease.key = "tablToCloseSetting_OnRelease"
+-- SettingsName_OnRelease
+
 --- complete section: CloseKey
 settingsSection_CloseKey.settings = {
   setting_closeKey,
-  setting_customKey
+  setting_customKey,
+  setting_onRelease
 }
 settings.registerGroup(settingsSection_CloseKey)
-
 
 -- SettingsSection: UI
 local settingsSection_UI : settings.GroupOptions = {}
@@ -120,15 +148,41 @@ if not selectedFoundInList then
   closeKey.set(closeKey, setting_closeKey.key, setting_closeKey.default)
 end
 
+-- Detector
+local tabReleasedThisFrame : boolean = false
+local customKeyPressedPreviousFrame : boolean = false
+local customKeyReleasedThisFrame : boolean = false
+local customKeyPressedThisFrame : boolean = input.getBooleanActionValue(customKey.key)
+local inventoryPressedPreviousFrame : boolean = false
+local inventoryReleasedThisFrame : boolean = false
+local inventoryPressedThisFrame : boolean = false
+
 return {
   -- https://openmw.readthedocs.io/en/openmw-0.49.0/reference/lua-scripting/overview.html#script-structure
   engineHandlers = {
     -- https://openmw.readthedocs.io/en/openmw-0.49.0/reference/lua-scripting/engine_handlers.html#engine-handlers-reference
     onKeyRelease = function (key : input.KeyboardEvent)
-      -- ui.showMessage("key pressed: " .. tostring(key.code))
-      -- if key.symbol == "tab" then
-      --   ui.showMessage("tab pressed")
-      -- end
+      tabReleasedThisFrame = key.code == input.KEY.Tab
+    end,
+    onFrame = function()
+      inventoryPressedThisFrame = input.isActionPressed(input.ACTION.Inventory)
+      inventoryReleasedThisFrame = not inventoryPressedThisFrame and inventoryPressedPreviousFrame
+      inventoryPressedPreviousFrame = inventoryPressedThisFrame
+      --
+      customKeyPressedThisFrame = input.getBooleanActionValue(customKey.key)
+      customKeyReleasedThisFrame = not customKeyPressedThisFrame and customKeyPressedPreviousFrame
+      customKeyPressedPreviousFrame = customKeyPressedThisFrame
+      --
+      if inventoryReleasedThisFrame then
+        print("inventory released this frame")
+      end
+      if customKeyReleasedThisFrame then
+        print("custom key released this frame")
+      end
+      if tabReleasedThisFrame then
+        print("tab released this frame")
+      end
+      tabReleasedThisFrame = false
     end,
   },
   -- eventHandlers = {

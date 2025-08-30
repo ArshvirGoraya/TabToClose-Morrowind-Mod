@@ -14,7 +14,9 @@
 ## Thoughts on Teal/Cyan/OpenMW combination
 
 Reason for using teal is mostly for auto-completion. The lua version of OpenMW API, doesn't really supply the Lau language server with auto-complete information. Teal, on the other hand, gives teal declaration files, which gives the Teal Language Server autocomplete information.
-- The teal declaration files are not complete through. There are some things missing. For example. the l10n function in core.d.tl was given a more specific return type in this.
+- The teal declaration files are not complete enough. There are some things missing. For example. the l10n function in core.d.tl was given a more specific return type in this project.
+    - It used to just return a `function`, buit now it returns `function(string, ?table):string`, which more specific and accurate.
+    - There are more examples of things missing such as the argument parameter in settings (which is different depending ont he type of setting it is (e.g., checkbox, select, etc.))
 - More over, things like `renderer` for settings can only have certain values, but this is not specified in the declarations. I would have loved to specify it with an Enum, but you actually cant pick values from enums yet with teal (e.g., `RendererEnum.checkbox`).
 - Futhermore, the Cyan build tool for Teal allows you to specify the build path and src path, so you can put all your teal files in src and all your generated path in build, but when you `require()` modules in teal, these module paths are NOT translated when generating lua files, which causes a error when modules are being fetched.
     - Even worse, openMW does NOT allow you to edit the `package.path` since it is sandboxed. So, you cannot tell lua to look for the package in the appropriate build path.
