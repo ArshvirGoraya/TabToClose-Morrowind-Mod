@@ -6,9 +6,6 @@ local input = require('openmw.input')
 local localiation = require('openmw.core')
 local I = require("openmw.interfaces")
 local settings = I.Settings
-
-
-
 local DB = require("scripts.ArshvirGoraya.tabToClose.dbug")
 
 l10n = "tabToClose"
@@ -176,20 +173,35 @@ local tabJustPressed = false
 local inventoryJustPressed = false
 local customKeyJustPressed = false
 
+local storage_UISection = storage.playerSection(settingsSection_UI.key)
 local function closeUITrigger()
-   DB.log("close UI")
+   DB.log("Checking UI")
+   for k, _ in pairs(I.UI.MODE) do
+      local modeName = tostring(k)
+      local selectedUI = storage_UISection.get(storage_UISection, "tabToCloseSetting_UI_" .. modeName)
+      if selectedUI and modeName == I.UI.getMode() then
+         DB.log("Closing UI: " .. modeName)
+         I.UI.setMode(nil)
+         return
+      end
+   end
 end
+
+
+
 
 return {
 
    engineHandlers = {
 
-      onKeyPress = function(key)
-         tabPressedThisFrame = key.code == input.KEY.Tab
-      end,
-      onKeyRelease = function(key)
-         tabReleasedThisFrame = key.code == input.KEY.Tab
-      end,
+
+
+
+
+
+
+
+
       onFrame = function()
          closeKeySelect = closeKey.get(closeKey, setting_closeKey.key)
          local onRelease = closeKey.get(closeKey, setting_onRelease.key)
@@ -209,19 +221,19 @@ return {
             inventoryPressedPreviousFrame = inventoryPressedThisFrame
 
          elseif closeKeySelect == setting_closeKeyTable.tabKey then
+            tabPressedThisFrame = input.isKeyPressed(input.KEY.Tab)
             if not onRelease then
                tabJustPressed = tabPressedThisFrame and not tabPressedPreviousFrame
                if tabJustPressed then
                   closeUITrigger()
                end
             else
+               tabReleasedThisFrame = not tabPressedThisFrame and tabPressedPreviousFrame
                if tabReleasedThisFrame then
                   closeUITrigger()
                end
             end
             tabPressedPreviousFrame = tabPressedThisFrame
-            tabPressedThisFrame = false
-            tabReleasedThisFrame = false
          elseif closeKeySelect == setting_closeKeyTable.customKey then
             customKeyPressedThisFrame = input.getBooleanActionValue(customKey.key)
             if not onRelease then

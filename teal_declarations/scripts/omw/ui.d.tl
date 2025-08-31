@@ -76,7 +76,7 @@ local record UI
   ]]
   setMode: function(
     mode: string, --[[(optional) New mode]]
-    options: table
+    options?: table
   )
   
   --[[

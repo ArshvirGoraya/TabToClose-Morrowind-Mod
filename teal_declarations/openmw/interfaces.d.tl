@@ -12,6 +12,7 @@ local scripts_omw_settings_player = require("scripts.omw.settings.player")
 local scripts_omw_skillhandlers = require("scripts.omw.skillhandlers")
 local scripts_omw_ui = require("scripts.omw.ui")
 local scripts_omw_usehandlers = require("scripts.omw.usehandlers")
+local scripts_omw_input_controls = require("scripts.omw.input.playercontrols")
 local record interfaces
   AI: scripts_omw_ai
   
@@ -32,6 +33,8 @@ local record interfaces
   SkillProgression: scripts_omw_skillhandlers
   
   UI: scripts_omw_ui
+
+  Controls: scripts_omw_input_controls
   
   metamethod __index: function(
     self: interfaces,
