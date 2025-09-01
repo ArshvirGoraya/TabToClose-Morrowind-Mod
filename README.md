@@ -2,6 +2,12 @@
 
 Morrowind mod for users that use tab to close UI elements (e.g., inventory UI).
 
+<p align="center">
+  <a href="https://www.nexusmods.com/morrowind/mods/57390">
+    <img width="80%" src="https://raw.githubusercontent.com/ArshvirGoraya/TabToClose-Morrowind-Mod/refs/heads/main/.github/Images/Header.jpg" alt="Header Image for Tab To Close Mod" />
+  </a>
+</p>
+
 ## Build
 
 - This simple mod was partly made to try out the Teal language, a typed dialect of lua, which compiles to lua.
