@@ -1,7 +1,7 @@
 
 
 
-local ui = require('openmw.ui')
+
 local input = require('openmw.input')
 local localiation = require('openmw.core')
 local I = require("openmw.interfaces")
@@ -47,27 +47,53 @@ setting_closeKey.name = localize("SettingsName_KeyChoice")
 
 local setting_closeKeyTable = {
    inventoryKey = localize("KeyChoices_InventoryKey"),
-   tabKey = localize("KeyChoices_TabKey"),
+   selectKey = localize("KeyChoices_SelectKey"),
    customKey = localize("KeyChoices_CustomKey"),
 }
 
 local setting_closeKeyList = {
    localize("KeyChoices_InventoryKey"),
-   localize("KeyChoices_TabKey"),
    localize("KeyChoices_CustomKey"),
+   localize("KeyChoices_SelectKey"),
 }
 setting_closeKey.argument = {
    l10n = l10n,
    items = setting_closeKeyList,
 }
-setting_closeKey.default = localize("KeyChoices_InventoryKey")
+setting_closeKey.default = localize("KeyChoices_SelectKey")
 setting_closeKey.description = localize("SettingsDescription_KeyChoice", {
    KeyChoices_InventoryKey = localize("KeyChoices_InventoryKey"),
-   KeyChoices_TabKey = localize("KeyChoices_TabKey"),
+   KeyChoices_SelectKey = localize("KeyChoices_SelectKey"),
    KeyChoices_CustomKey = localize("KeyChoices_CustomKey"),
    SettingsName_CustomKey = localize("SettingsName_CustomKey"),
+   SettingsName_SelectKey = localize("SettingsName_SelectKey"),
 })
 setting_closeKey.key = "tabToCloseSetting_CloseKey"
+
+local setting_selectKey = {}
+setting_selectKey.renderer = RendererEnum.select
+setting_selectKey.name = localize("SettingsName_SelectKey")
+setting_selectKey.description = localize("SettingsDescription_SelectKey", {
+   SettingsName_KeyChoice = localize("SettingsName_KeyChoice"),
+   KeyChoices_SelectKey = localize("KeyChoices_SelectKey"),
+})
+setting_selectKey.key = "tabToCloseSetting_SelectKey"
+
+local input_KeyNames = {}
+local input_KeyTable = {}
+for k, v in pairs(input.KEY) do
+   table.insert(input_KeyNames, k)
+   input_KeyTable[k] = v
+end
+
+setting_selectKey.default = input.getKeyName(input.KEY.Tab)
+setting_selectKey.argument = {
+   l10n = l10n,
+   items = input_KeyNames,
+}
+
+
+
 
 
 
@@ -106,6 +132,7 @@ setting_onRelease.key = "tablToCloseSetting_OnRelease"
 
 settingsSection_CloseKey.settings = {
    setting_closeKey,
+   setting_selectKey,
    setting_customKey,
    setting_onRelease,
 }
@@ -159,9 +186,10 @@ if not selectedFoundInList then
 end
 
 
-local tabPressedPreviousFrame = false
-local tabPressedThisFrame = false
-local tabReleasedThisFrame = false
+local selectKeyPressedPreviousFrame = false
+local selectKeyPressedThisFrame = false
+local selectKeyReleasedThisFrame = false
+
 local customKeyPressedPreviousFrame = false
 local customKeyReleasedThisFrame = false
 local customKeyPressedThisFrame = input.getBooleanActionValue(customKey.key)
@@ -220,20 +248,21 @@ return {
             end
             inventoryPressedPreviousFrame = inventoryPressedThisFrame
 
-         elseif closeKeySelect == setting_closeKeyTable.tabKey then
-            tabPressedThisFrame = input.isKeyPressed(input.KEY.Tab)
+         elseif closeKeySelect == setting_closeKeyTable.selectKey then
+            local selectedKey = closeKey.get(closeKey, setting_selectKey.key)
+            selectKeyPressedThisFrame = input.isKeyPressed(input_KeyTable[selectedKey])
             if not onRelease then
-               tabJustPressed = tabPressedThisFrame and not tabPressedPreviousFrame
+               tabJustPressed = selectKeyPressedThisFrame and not selectKeyPressedPreviousFrame
                if tabJustPressed then
                   closeUITrigger()
                end
             else
-               tabReleasedThisFrame = not tabPressedThisFrame and tabPressedPreviousFrame
-               if tabReleasedThisFrame then
+               selectKeyReleasedThisFrame = not selectKeyPressedThisFrame and selectKeyPressedPreviousFrame
+               if selectKeyReleasedThisFrame then
                   closeUITrigger()
                end
             end
-            tabPressedPreviousFrame = tabPressedThisFrame
+            selectKeyPressedPreviousFrame = selectKeyPressedThisFrame
          elseif closeKeySelect == setting_closeKeyTable.customKey then
             customKeyPressedThisFrame = input.getBooleanActionValue(customKey.key)
             if not onRelease then

@@ -16,13 +16,16 @@ SectionDescription_CloseKey: |-
 SettingsName_KeyChoice: Key Choice
 
 KeyChoices_InventoryKey: Inventory Key
-KeyChoices_TabKey: Tab Key
 KeyChoices_CustomKey: Custom Key
+KeyChoices_SelectKey: Select Key
 
 SettingsDescription_KeyChoice: |-
-  - {KeyChoices_InventoryKey}: Use the key you use to open the inventory. If this is tab, use {KeyChoices_TabKey} instead!
-  - {KeyChoices_TabKey}: Use the tab key.
+  - {KeyChoices_InventoryKey}: Use the key you use to open the inventory. If this is tab, use {KeyChoices_SelectKey} instead!
   - {KeyChoices_CustomKey}: Use the custom key. Must set {SettingsName_CustomKey} or this will do nothing.
+  - {KeyChoices_SelectKey}: Use the key selected in {SettingsName_SelectKey} setting. Some keys can't be set in {SettingsName_CustomKey} or don't work as {KeyChoices_InventoryKey}, so you can use this option instead.
+
+SettingsName_SelectKey: Select Key
+SettingsDescription_SelectKey: Must set {SettingsName_KeyChoice} to {KeyChoices_SelectKey} for this key to be used.
 
 SettingsName_CustomKey: Custom Key
 SettingsDescription_CustomKey: Must set {SettingsName_KeyChoice} to {KeyChoices_CustomKey} for this key to be used.
