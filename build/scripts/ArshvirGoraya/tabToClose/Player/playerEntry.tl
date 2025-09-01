@@ -151,6 +151,7 @@ settingsSection_UI.permanentStorage = false
 local defaultUI : {string:boolean} = {
   Interface = true,
   Container = true,
+  Rest = true,
 }
 -- table.sort(I.UI.MODE)
 settingsSection_UI.settings = {}
@@ -160,6 +161,9 @@ for k, _ in pairs(I.UI.MODE) do
   setting_UI.renderer = RendererEnum.checkbox
   setting_UI.name = localize("SettingsUI_" .. modeName)
   setting_UI.default = false or defaultUI[modeName]
+  if setting_UI.default then
+    DB.log("tab to close on : ", modeName)
+  end
   setting_UI.key = "tabToCloseSetting_UI_" .. modeName
   table.insert(settingsSection_UI.settings, setting_UI)
 end

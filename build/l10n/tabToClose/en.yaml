@@ -7,7 +7,7 @@ ModName: Tab To Close
 ModDescription: |-
   Force close chosen UI with chosen Key.
 
-  - Originally made for the tab key, which can get stuck in the inventory search bar, disallowing you to use it to close the inventory UI.
+  - Originally made for the tab key, which can get stuck in search bar, text line inputs, or get stuck cycling through UI elements, disallowing you to use it to close the certain UI.
 
 SectionName_CloseKey: Close Key
 SectionDescription_CloseKey: |-
@@ -20,7 +20,7 @@ KeyChoices_CustomKey: Custom Key
 KeyChoices_SelectKey: Select Key
 
 SettingsDescription_KeyChoice: |-
-  - {KeyChoices_InventoryKey}: Use the key you use to open the inventory. If this is tab, use {KeyChoices_SelectKey} instead!
+  - {KeyChoices_InventoryKey}: Use the key you use to open the inventory.
   - {KeyChoices_CustomKey}: Use the custom key. Must set {SettingsName_CustomKey} or this will do nothing.
   - {KeyChoices_SelectKey}: Use the key selected in {SettingsName_SelectKey} setting. Some keys can't be set in {SettingsName_CustomKey} or don't work as {KeyChoices_InventoryKey}, so you can use this option instead.
 
@@ -37,9 +37,11 @@ SettingsDescription_OnRelease: If true, will trigger UI close on key release ins
 SectionName_UI: UI
 SectionDescription_UI: |-
   - Select UI mode to close when you press the chosen key in the {SectionName_CloseKey} section.
-  - OpenMW 4.9 does not allow for detecting what window is open, but does allow for detecting what mode is. The "Interface" mode includes the inventory window.
-    - So if "interface" is set to true, and the close key is pressed, the interface mode will close (which includes the inventory window).
+  - OpenMW 4.9 API does not allow for detecting what window is open, but does allow for detecting what mode is. The "Interface" mode includes the inventory window.
+    - So if "Interface" is set to true, and the close key is pressed, the interface mode will close if its open (which includes the inventory window).
 
 # You can overwrite the name of any UI setting by placing it here: Just prefix it with "SettingsUI_"
 # Example: 
 # SettingsUI_Interface: Interface
+
+# Overwriting the SelectKey options is not currently supported.
